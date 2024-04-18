@@ -101,9 +101,43 @@ const deleteTask = asyncHandler ( async (req, res) => {
     }
 })
 
+const updateTask = asyncHandler ( async (req, res) => {
+    try {
+        const {name, status, isCompleted} = req.body;
+        const task = await Task.updateOne({
+            _id: req.params.id,
+            user: req.user._id
+        },
+        {
+            $set: {
+                name,
+                status,
+                isCompleted
+            }
+        })
+
+        if(!task.modifiedCount) {
+            res.status(400);
+            throw new Error("Task not updated")
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "Task Updated Successfully."
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400);
+        throw new Error("Task not updated")
+    }
+})
+
 module.exports = {
     getTask,
     createTask,
     getAllTasks,
-    deleteTask
+    deleteTask,
+    updateTask
 }
